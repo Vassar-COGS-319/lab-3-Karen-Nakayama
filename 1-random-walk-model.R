@@ -8,9 +8,30 @@
 # drift is the drift rate (default value is 0)
 # sdrw is the variability in the drift rate (default value is 0.3)
 # criterion is the threshold for a response (default value is 3)
+#Positive criterion =correct, Negative criterion=incorrect
 
-random.walk.model <- function(samples, drift=0, sdrw=0.3, criterion=3){
+add.evidence <- function(drift, sdrw){
+  internal.evidence <- 0
+  number.of.samples <-0
+  criterion<-3
+  drift<-0
+  sdrw<-0.3
+  while (internal.evidence <= criterion && internal.evidence>= (-criterion)) {
+    number.of.samples <- number.of.samples+1
+    newval <-rnorm(1, drift, sdrw)
+    internal.evidence <- internal.evidence+newval
+  }  
+  #If above criterion =3, it would print correct.
+
+  return(c(internal.evidence > criterion, number.of.samples))
+}
   
+random.walk.model <- function(samples, drift=0, sdrw=0.3, criterion=3){
+  data <- replicate(samples, add.evidence(drift, sdrw))
+  accuracy.array <- data[1, 1:samples] #Grab the 1st thing out of Return (internal.evidence
+  #and number.of.samples) and do that for 1 to out of all samples.
+  rt.array <-data[2, 1:samples] #Grab the 2nd thing out of Return (internal.evidence
+  #and number.of.samples) and do that for 1 to out of all samples.
   output <- data.frame(
     correct = accuracy.array,
     rt = rt.array
@@ -18,6 +39,7 @@ random.walk.model <- function(samples, drift=0, sdrw=0.3, criterion=3){
   
   return(output)
 }
+
 
 # test the model ####
 
