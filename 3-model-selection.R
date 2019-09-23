@@ -23,3 +23,5 @@
 # predicted by each model. Based on these distributions, what kind of information could
 # we use to evaluate which model is a better descriptor of the data for the experiment?
 # Describe briefly how you might make this evaluation.
+
+random.walk.model(1000, drift= 0, sdrw = 0.3, criterion=3)
