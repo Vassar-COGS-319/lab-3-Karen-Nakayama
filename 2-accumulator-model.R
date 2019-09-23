@@ -9,13 +9,55 @@
 # rate.1 is the evidence accumulation rate for the incorrect response (default value is 40)
 # criterion is the threshold for a response (default value is 3)
 
+#Accumulator 1 and 2 are going up at a different rate. Whichever that gets to the threshold first is the correct.
+
 # one oddity: note that higher values for rate.1 and rate.2 will actually produce slower RTs.
 # this is because the rate parameter is controlling the rate of decay of the exponential distribution,
 # so faster rates mean that less evidence is likely to accumulate on each step. we could make
 # these parameters more intuitive by taking 1/rate.1 and 1/rate.2 as the values to rexp().
 
-accumulator.model <- function(samples, rate.1=40, rate.2=40, criterion=3){
+add.evidence <- function(rate.1=40, rate.2=40){
+  evidence.accu.1 <- 0
+  evidence.accu.2 <-0
+  number.of.samples <-0
+  criterion<-3
+  rate.1 <-40
+  rate.2 <-40
+  while ((evidence.accu.1 <= criterion) &&(evidence.accu.2 <= criterion)) {
+    number.of.samples <- number.of.samples+1
+    newval1 <-rexp(1,rate.1)
+    newval2 <-rexp(1, rate.2)
+    evidence.accu.1<-evidence.accu.1+newval1
+    evidence.accu.2<-evidence.accu.2+newval2
+  }  
+  if(evidence.accu.1>evidence.accu.2){ #Accumulator 1 =correct
+    return(c(TRUE, number.of.samples))
+  }
+  if(evidence.accu.2>evidence.accu.1){ #Accumulator 2 =incorrect
+    return(c(FALSE, number.of.samples))
+  }
+}
+
+random.walk.model <- function(samples, drift=0, sdrw=0.3, criterion=3){
+  data <- replicate(samples, add.evidence(drift, sdrw))
+  accuracy.array <- data[1, 1:samples] #Grab the 1st thing out of Return (internal.evidence
+  #and number.of.samples) and do that for 1 to out of all samples.
+  rt.array <-data[2, 1:samples] #Grab the 2nd thing out of Return (internal.evidence
+  #and number.of.samples) and do that for 1 to out of all samples.
+  output <- data.frame(
+    correct = accuracy.array,
+    rt = rt.array
+  )
   
+  return(output)
+}
+
+accumulator.model <- function(samples, rate.1=40, rate.2=40, criterion=3){
+  data <- replicate(samples,add.evidence(rate.1, rate.2))
+  accuracy.array <- accuracy.array <- data[1, 1:samples] #Grab the 1st thing out of Return (internal.evidence
+  #and number.of.samples) and do that for 1 to out of all samples.
+  rt.array <-data[2, 1:samples] #Grab the 2nd thing out of Return (internal.evidence
+  #and number.of.samples) and do that for 1 to out of all samples.
 
   output <- data.frame(
     correct = accuracy.array,
