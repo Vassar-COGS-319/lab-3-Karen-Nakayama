@@ -24,6 +24,10 @@
 # we use to evaluate which model is a better descriptor of the data for the experiment?
 # Describe briefly how you might make this evaluation.
 
-Test.1<-random.walk.model(1000, drift= 0, sdrw = 0.3, criterion=3)
+Test.1<-random.walk.model(1000, drift= 1, sdrw = 0.3, criterion=3)
 sum(Test.1$correct) / length(Test.1$correct)
 mean(Test.1$rt)
+
+Test.2<-accumulator.model(1000)
+sum(Test.2$correct) / length(Test.2$correct)
+mean(Test.2$rt)
